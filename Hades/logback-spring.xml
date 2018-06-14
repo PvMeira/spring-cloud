@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true"
+               scanPeriod="1 hour">  <!-- this set application to read this file each hour -->
+    <property name="LOG_PATH" value="log"/>
+    <property name="LOG_FILE" value="plus"/>
+    <property name="LOG_MAX_SIZE" value="10MB"/>
+    <property name="LOG_SERVER" value="INFO"/>
+    <property name="LOG_APPLICATION" value="DEBUG"/>
+
+    <!--this will save all logs in a example.log file-->
+    <appender name="fileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${LOG_PATH}/${LOG_FILE}.log</File>
+
+        <!--Change to new file-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <FileNamePattern>${LOG_PATH}/compressed/${LOG_FILE}.%d{yyyy-MM-dd}.log.gz</FileNamePattern>
+            <!-- keep 7 days' worth of history -->
+            <MaxHistory>7</MaxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d - [%level] - %c{30}:%method:%line - %m%n</pattern>
+            <!--this will print:
+             date(YYYY-MM-DD HH:MM:SS,SSS) - LogLevel - class:method:line LogMessage
+             https://logback.qos.ch/manual/layouts.html
+             -->
+        </encoder>
+    </appender>
+
+    <!--This appender will save all records as example.json-->
+    <appender name="jsonAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${LOG_PATH}/${LOG_FILE}.json</File>
+
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <FileNamePattern>${LOG_PATH}/compressed/${LOG_FILE}.%d{yyyy-MM-dd}.json.gz</FileNamePattern>
+            <!-- keep 3 days' worth of history -->
+            <MaxHistory>3</MaxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!--this will print on system console-->
+    <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d - [%level] - %c{30}:%method:%line - %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <!--this config will aplly to all classes from com.kenai.br.hades package and will use all appenders-->
+    <logger name="com.kenai.br.hades" level="${LOG_APPLICATION}" additivity="false">
+        <appender-ref ref="fileAppender"/>
+        <appender-ref ref="jsonAppender"/>
+        <appender-ref ref="consoleAppender"/>
+    </logger>
+
+    <!--this will apply to all classes witch do not have any logger-->
+    <root level="${LOG_SERVER}">
+        <appender-ref ref="fileAppender"/>
+        <appender-ref ref="consoleAppender"/>
+    </root>
+
+</configuration>

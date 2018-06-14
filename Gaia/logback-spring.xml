@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true"
+               scanPeriod="1 hour">
+    <property name="LOG_PATH" value="log"/>
+    <property name="LOG_FILE" value="plus"/>
+    <property name="LOG_MAX_SIZE" value="10MB"/>
+    <property name="LOG_SERVER" value="INFO"/>
+    <property name="LOG_APPLICATION" value="DEBUG"/>
+
+    <appender name="fileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${LOG_PATH}/${LOG_FILE}.log</File>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_PATH}/compressed/${LOG_FILE}.%d{yyyy-MM-dd}.log.gz</FileNamePattern>
+            <MaxHistory>7</MaxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d - [%level] - %c{30}:%method:%line - %m%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="jsonAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${LOG_PATH}/${LOG_FILE}.json</File>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_PATH}/compressed/${LOG_FILE}.%d{yyyy-MM-dd}.json.gz</FileNamePattern>
+            <MaxHistory>3</MaxHistory>
+        </rollingPolicy>
+    </appender>
+    <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d - [%level] - %c{30}:%method:%line - %m%n</pattern>
+        </encoder>
+    </appender>
+    <logger name="com.kenai.br.gaia" level="${LOG_APPLICATION}" additivity="false">
+        <appender-ref ref="fileAppender"/>
+        <appender-ref ref="jsonAppender"/>
+        <appender-ref ref="consoleAppender"/>
+    </logger>
+    <root level="${LOG_SERVER}">
+        <appender-ref ref="fileAppender"/>
+        <appender-ref ref="consoleAppender"/>
+    </root>
+</configuration>

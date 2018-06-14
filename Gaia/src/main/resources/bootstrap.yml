@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: Gaia
+  cloud:
+    config:
+      uri: http://localhost:9090
